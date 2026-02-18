@@ -6,7 +6,9 @@ aaa_root:
 banners:
   motd: 'You shall not pass. Unless you are authorized. Then you shall pass.
 
-    EOF'
+    EOF
+
+    '
 config_end: true
 daemon_terminattr:
   cvaddrs:
@@ -84,6 +86,15 @@ local_users:
   sha512_password: $6$arista$HXQFb.AFJFZfYOxx360GcBtFfgu.1cuvXaFVt7iWyOjkq5plRDAIwMjxYp9njqEcgviwHZX3teFdGHmaKZZgT.
   ssh_key: ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQCTxTOLmMWiv4t2DoPJCzjAIRFLpoPM9EJHI5bNF3li4NIq2idcywRMLuiSyFUooSXpuh8Sp3A/wf8eqL230ZTPfSw9Bc0k0UB2TUzDgBDqxWKAQNWiG+Rl4Jtr+D9S7IlJWHEb7WoR05EiEgM9bmEoTTiY53d7nb9NCaMQ6Maz/VbT4DtNJ0B1DRgUkG7n1PZbVu8GNklVtw3D/oEaD1wKMH0HBk5vnNsBzk+BODMcffhyN9T4A4DYKqnSy4/Rf3AYC5d2xnwkyj3gXr6ugK2ON5T4+SBW4nruHLh1J95khZ98DrwgX9/UXWEWY1moGG0MuXTHFxV97vDUlj6ZLEzl
     arista@automation-atd-sydney-3-0aa45f33-eos
+logging:
+  vrfs:
+  - name: default
+    source_interface: Management0
+    hosts:
+    - name: 10.200.0.108
+      protocol: udp
+    - name: 10.200.1.108
+      protocol: udp
 management_api_http:
   enable_https: true
   enable_vrfs:

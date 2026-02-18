@@ -1,4 +1,4 @@
-# s1-leaf2
+# s1-leaf6
 
 ## Table of Contents
 
@@ -63,7 +63,7 @@ EOF
 
 | Management Interface | Description | Type | VRF | IP Address | Gateway |
 | -------------------- | ----------- | ---- | --- | ---------- | ------- |
-| Management0 | OOB_MANAGEMENT | oob | default | 192.168.0.13/24 | 192.168.0.1 |
+| Management0 | OOB_MANAGEMENT | oob | default | 192.168.0.29/24 | 192.168.0.1 |
 
 ##### IPv6
 
@@ -78,7 +78,7 @@ EOF
 interface Management0
    description OOB_MANAGEMENT
    no shutdown
-   ip address 192.168.0.13/24
+   ip address 192.168.0.29/24
 ```
 
 ### DNS Domain
@@ -259,7 +259,7 @@ logging source-interface Management0
 
 | Domain-id | Local-interface | Peer-address | Peer-link |
 | --------- | --------------- | ------------ | --------- |
-| RACK1 | Vlan4094 | 10.1.253.0 | Port-Channel1 |
+| RACK3 | Vlan4094 | 10.1.253.0 | Port-Channel1 |
 
 Dual primary detection is disabled.
 
@@ -268,7 +268,7 @@ Dual primary detection is disabled.
 ```eos
 !
 mlag configuration
-   domain-id RACK1
+   domain-id RACK3
    local-interface Vlan4094
    peer-address 10.1.253.0
    peer-link Port-Channel1
@@ -323,6 +323,7 @@ vlan internal order ascending range 1006 1199
 | VLAN ID | Name | Trunk Groups |
 | ------- | ---- | ------------ |
 | 10 | Ten | - |
+| 20 | Twenty | - |
 | 4094 | MLAG | MLAG |
 
 ### VLANs Device Configuration
@@ -331,6 +332,9 @@ vlan internal order ascending range 1006 1199
 !
 vlan 10
    name Ten
+!
+vlan 20
+   name Twenty
 !
 vlan 4094
    name MLAG
@@ -347,11 +351,10 @@ vlan 4094
 
 | Interface | Description | Mode | VLANs | Native VLAN | Trunk Group | Channel-Group |
 | --------- | ----------- | ---- | ----- | ----------- | ----------- | ------------- |
-| Ethernet1 | MLAG_s1-leaf1_Ethernet1 | *trunk | *- | *- | *MLAG | 1 |
-| Ethernet2 | L2_s1-spine1_Ethernet3 | *trunk | *10 | *- | *- | 2 |
-| Ethernet3 | L2_s1-spine2_Ethernet3 | *trunk | *10 | *- | *- | 2 |
-| Ethernet4 | SERVER_s1-host1_eth2 | *access | *10 | *- | *- | 4 |
-| Ethernet6 | MLAG_s1-leaf1_Ethernet6 | *trunk | *- | *- | *MLAG | 1 |
+| Ethernet1 | MLAG_s1-leaf5_Ethernet1 | *trunk | *- | *- | *MLAG | 1 |
+| Ethernet2 | L2_s1-spine1_Ethernet10 | *trunk | *10,20 | *- | *- | 2 |
+| Ethernet3 | L2_s1-spine2_Ethernet10 | *trunk | *10,20 | *- | *- | 2 |
+| Ethernet6 | MLAG_s1-leaf5_Ethernet6 | *trunk | *- | *- | *MLAG | 1 |
 
 *Inherited from Port-Channel Interface
 
@@ -360,27 +363,22 @@ vlan 4094
 ```eos
 !
 interface Ethernet1
-   description MLAG_s1-leaf1_Ethernet1
+   description MLAG_s1-leaf5_Ethernet1
    no shutdown
    channel-group 1 mode active
 !
 interface Ethernet2
-   description L2_s1-spine1_Ethernet3
+   description L2_s1-spine1_Ethernet10
    no shutdown
    channel-group 2 mode active
 !
 interface Ethernet3
-   description L2_s1-spine2_Ethernet3
+   description L2_s1-spine2_Ethernet10
    no shutdown
    channel-group 2 mode active
 !
-interface Ethernet4
-   description SERVER_s1-host1_eth2
-   no shutdown
-   channel-group 4 mode active
-!
 interface Ethernet6
-   description MLAG_s1-leaf1_Ethernet6
+   description MLAG_s1-leaf5_Ethernet6
    no shutdown
    channel-group 1 mode active
 ```
@@ -393,37 +391,27 @@ interface Ethernet6
 
 | Interface | Description | Mode | VLANs | Native VLAN | Trunk Group | LACP Fallback Timeout | LACP Fallback Mode | MLAG ID | EVPN ESI |
 | --------- | ----------- | ---- | ----- | ----------- | ------------| --------------------- | ------------------ | ------- | -------- |
-| Port-Channel1 | MLAG_s1-leaf1_Port-Channel1 | trunk | - | - | MLAG | - | - | - | - |
-| Port-Channel2 | L2_SPINES_Port-Channel2 | trunk | 10 | - | - | - | - | 2 | - |
-| Port-Channel4 | SERVER_s1-host1 | access | 10 | - | - | - | - | 4 | - |
+| Port-Channel1 | MLAG_s1-leaf5_Port-Channel1 | trunk | - | - | MLAG | - | - | - | - |
+| Port-Channel2 | L2_SPINES_Port-Channel9 | trunk | 10,20 | - | - | - | - | 2 | - |
 
 #### Port-Channel Interfaces Device Configuration
 
 ```eos
 !
 interface Port-Channel1
-   description MLAG_s1-leaf1_Port-Channel1
+   description MLAG_s1-leaf5_Port-Channel1
    no shutdown
    switchport mode trunk
    switchport trunk group MLAG
    switchport
 !
 interface Port-Channel2
-   description L2_SPINES_Port-Channel2
+   description L2_SPINES_Port-Channel9
    no shutdown
-   switchport trunk allowed vlan 10
+   switchport trunk allowed vlan 10,20
    switchport mode trunk
    switchport
    mlag 2
-!
-interface Port-Channel4
-   description SERVER_s1-host1
-   no shutdown
-   switchport access vlan 10
-   switchport mode access
-   switchport
-   mlag 4
-   spanning-tree portfast
 ```
 
 ### VLAN Interfaces
